@@ -1,0 +1,76 @@
+### Now we can do some basic statistics to check the quality of the mapped sequence data. Bamstats files should have been created during the previous step.
+### I would recommend doing these steps one by one, instead of running this whole script as one process. That way you can investigate the separate outputs as you go.
+
+# If bamstats files are not produced automatically during the runfastq2vcf step, then use the following line to produce them
+# cat samples.txt | parallel -j 2 "samtools flagstat {}.mkdup.bam > {}.mkdup.bamstats"
+
+
+## After running the fastq2matrix pipeline we can extract information from these files to gain an idea of their quality.
+## We are interested in:
+## Number of reads
+## Percentage of reads mapping to the reference genome
+## Coverage
+## Number of SNPs
+
+## To extract the number of reads
+# For multiple samples, feed in a list of all the samples and use xargs
+
+# The code below is saying show the first line (head -n 1) and extract the first item (print $1)
+# It creates a list (total_reads) of the number for all samples in the order of the sample list
+
+ls *.mkdup.bamstats | xargs -i -P1 sh -c 'head -1 {} | awk -F '"'"' '"'"' '"'"'{print $1}'"'"'' > total_reads
+
+# Number of reads mapping to reference genome
+# This is the same principle, but extracting the first item on the 5th line
+
+ls *.mkdup.bamstats| xargs -i -P1 sh -c 'head -5 {} | tail -1 | awk -F '"'"' '"'"' '"'"'{print $1}'"'"'' > mapped_reads
+
+# Look at coverage as a %
+# Step 1 - Create a list of all the sample names, you just want the prefix
+
+ls *.mkdup.bam | sed -r 's/.mkdup.bam//g' > covlist
+
+# Step 2 - Create a text file with the bash script that you want to run in parallel
+# Use vim to create the text file:
+
+#vim coverage_script.sh
+#i
+#samtools depth $1.mkdup.bam -a > $1.coverage 
+
+#samtools depth $1.bqsr.bam -a > $1.coverage 
+
+# Step 3 - Call the command using parallel - to create coverage files
+# Open the sample list, then using that list use parallel to go through the list,
+# one by one (-j 1) and execute the bash script coverage_script.sh. The --bar is to show a progress bar.
+
+ cat covlist | parallel -j 10 --bar bash coverage_script.sh {}
+
+ # Step 4 - Extract info from coverage files
+ # Now we are interested how many postions in the genome have a coverage of >5 or >10 or >20.
+ # Run these in screen, they can take a while
+
+# Use following script to go through each cov file and extract the number of positions that have a coverage of 5 or above - easily modified to 10
+# For mosquitoes could use 10 but Holly is using 5, which is what Susana suggested
+# This creates a list in a text file which can easily be copied into a table - divide by genome length for proportion
+
+ls *.coverage | parallel --keep-order -j 10 --bar 'cat {} | awk '"'"'{if($3>=5)print}'"'"' | wc -l' > coverage_5
+ls *.coverage | parallel --keep-order -j 10 --bar 'cat {} | awk '"'"'{if($3>=10)print}'"'"' | wc -l' > coverage_10
+ls *.coverage | parallel --keep-order -j 10 --bar 'cat {} | awk '"'"'{if($3>=20)print}'"'"' | wc -l' > coverage_20
+
+# Step 5
+# Now let's look at what the coverage is visually by creating coverage plots across genome
+
+## Check coverage as an average read depth across entire genome
+# create fastq2samples.txt file
+ls *_1.fastq.gz | sed 's/_1.fastq.gz//' > fastq2vcfsamples.txt
+
+# Run the create_coverage_plots_sambamba.py script. You need to change the command line call to contain the chromosome names for your species.
+# Make sure that you have mamba and sambabma installed in your conda environment. 
+# You will also need the second python script (chromo_coverage.py) which is called by the first python script
+# For example:
+
+python chromo_coverage_plots_sambabma.py NC_064874.1 NC_064875.1 NC_064873.1 NC_064612.1
+
+
+
+
