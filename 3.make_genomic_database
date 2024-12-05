@@ -1,0 +1,19 @@
+### Now that your samples are filtered and you know which ones you want to continue the analysis with, you can create a genomics database with the samples you want to keep.
+### This genomics database is a VCF which contains all of the SNPs in all of the samples across the whole genome.
+
+## To make a genomics database of sample VCFs, use the following commands
+## Make a list of your samples, then remove any that you do not want to do further analysis with (eg. using vim database_samples.txt and removing those sample names)
+
+ls *.g.vcf.gz | sed 's/.g.vcf.gz//' > database_samples.txt 
+
+## Merge these VCFs using merge_vcfs.py import
+## you can adjust the number of threads to run depending on how busy the server is
+
+merge_vcfs.py import --sample-file database_samples.txt --ref [insert your reference genome] --prefix [insert name you want your database to have] --vcf-dir . --threads 10 > database_importing_log.txt 2>&1
+
+## now merge VCF files
+## use merge_vcfs.py genotype
+
+merge_vcfs.py genotype --ref [insert your reference genome file] --prefix [database name as above] --threads 10 > database_genotyping_log.txt 2>&1
+
+# resulting vcf should be called the database name that you selected
