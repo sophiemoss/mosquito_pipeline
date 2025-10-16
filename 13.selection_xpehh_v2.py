@@ -15,7 +15,7 @@ import matplotlib.patches as mpatches
 import gffutils
 
 # %% set wd
-os.chdir('/mnt/storage11/sophie/bijagos_mosq_wgs/2019_melas_fq2vcf_gambiae_aligned/genomics_database_melas2019plusglobal/genomics_database_melas2019plusglobal_vcf/melas_2019_plusglobal_filtering')
+os.chdir('/mnt/storage11/sophie/Anisa/wgs_project/')
 os.getcwd()
 
 # %%
@@ -24,7 +24,7 @@ os.getcwd()
 #allel.vcf_to_zarr('2019melasglobal_finalfiltered_gambiaealigned_phased.vcf.gz', '2019melasglobal_finalfiltered_gambiaealigned_phased.zarr', fields='*', overwrite=True)
 
 # %%
-callset = zarr.open('2019melasglobal_finalfiltered_gambiaealigned_phased.zarr', mode='r')
+callset = zarr.open('ghana_gambiae_filtered_phased.zarr', mode='r')
 #callset.tree(expand=True)
 
 # %%
@@ -34,9 +34,9 @@ print(gt.shape)
 
 # %%
 ## import metadata
-df_samples=pd.read_csv('metadata_melasplusglobal.csv',sep=',',usecols=['sample','country','year','species','island'])
+df_samples=pd.read_csv('anisa_metadata.csv',sep=',',usecols=['sample','site','phenotype','species'])
 df_samples.head()
-df_samples.groupby(by=['country']).count
+df_samples.groupby(by=['site']).count
 
 # %%
 ## VCF is phased so we can convert genotype arrays made earlier to haplotype array
@@ -45,7 +45,7 @@ sample_ids = callset['samples'][:]
 
 # %% Create arrays needed for Cameroon samples
 # Get sample identifiers for Cameroon samples from df_samples
-cam_sample_ids = df_samples[df_samples['country'] == 'Cameroon']['sample'].values
+cam_sample_ids = df_samples[df_samples['site'] == 'Cameroon']['sample'].values
 # Find indices of these samples in the genotype array
 cam_indices = np.array([np.where(sample_ids == id)[0][0] for id in cam_sample_ids if id in sample_ids])
 # Verify the indices are within the correct range
@@ -55,7 +55,7 @@ gt_cam_samples = gt.take(cam_indices, axis=1)
 
 # %% Create arrays needed for Bijagos samples
 # Get sample identifiers for Bijagos samples from df_samples
-bij_sample_ids = df_samples[df_samples['country'] == 'Guinea-Bissau']['sample'].values
+bij_sample_ids = df_samples[df_samples['site'] == 'Guinea-Bissau']['sample'].values
 # Find indices of these samples in the genotype array
 bij_indices = np.array([np.where(sample_ids == id)[0][0] for id in bij_sample_ids if id in sample_ids])
 # Verify the indices are within the correct range
