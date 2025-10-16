@@ -69,6 +69,7 @@ ls *_1.fastq.gz | sed 's/_1.fastq.gz//' > fastq2vcfsamples.txt
 # You will also need the second python script (chromo_coverage.py) which is called by the first python script
 # For example:
 
+# For Darlingi
 python chromo_coverage_plots_sambabma.py NC_064874.1 NC_064875.1 NC_064873.1 NC_064612.1
 
 
