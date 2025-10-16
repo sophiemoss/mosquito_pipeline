@@ -29,3 +29,5 @@ raxml-ng --all --msa Anopheles_mito_18022024_aligned_bijagos_with_global_melasv6
 # RaXml outputs the best fitting tree, and you can then upload this to iTOL to see it!
 
 raxml-ng --all --msa cox1_bed_edit_combined_trimmed.afa --model GTR --prefix AnDarCOX1 --seed 183645 --bs-metric tbe --tree rand{10} --bs-trees 1000
+
+raxml-ng --all --msa kai_combined_multispecies_trimmed_COX1.hap1.fasta --model GTR --prefix Kai_COX1 --seed 264028 --bs-metric tbe --tree rand{10} --bs-trees 1000

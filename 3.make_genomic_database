@@ -11,9 +11,20 @@ ls *.g.vcf.gz | sed 's/.g.vcf.gz//' > database_samples.txt
 
 merge_vcfs.py import --sample-file database_samples.txt --ref [insert your reference genome] --prefix [insert name you want your database to have] --vcf-dir . --threads 10 > database_importing_log.txt 2>&1
 
+# eg #
+
+/mnt/storage11/sophie/fastq2matrix/scripts/merge_vcfs.py import --sample-file database_samples.txt --ref /mnt/storage11/sophie/reference_genomes/A_gam_P4_ensembl/Anopheles_gambiae.AgamP4.dna.toplevel.fa --prefix ghana_gambiae --vcf-dir . --threads 10 > gambiae_database_importing_log.txt 2>&1
+
+
 ## now merge VCF files
 ## use merge_vcfs.py genotype
 
 merge_vcfs.py genotype --ref [insert your reference genome file] --prefix [database name as above] --threads 10 > database_genotyping_log.txt 2>&1
 
-# resulting vcf should be called the database name that you selected
+# eg #
+
+/mnt/storage11/sophie/fastq2matrix/scripts/merge_vcfs.py genotype --ref /mnt/storage11/sophie/reference_genomes/A_gam_P4_ensembl/Anopheles_gambiae.AgamP4.dna.toplevel.fa --prefix ghana_gambiae --threads 10 > database_genotyping_log.txt 2>&1
+
+# resulting database vcf should be called the database name that you selected
+# this will contain all of the variants across all of the samples that you have included in your database
+# next step, you need to filter the database to keep only the high quality variants!

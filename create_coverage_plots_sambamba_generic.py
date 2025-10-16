@@ -40,7 +40,7 @@ for sample_name in sample_names:
     sub.to_csv(output_file, sep='\t', index=None)
 
 # Use the other Python script to create figures of coverage over the genome
-subprocess.run('cat fastq2vcfsamples.txt | parallel -j 30 "python chromo_coverage.py --sample {} --csvfile {}_chromocov.filtered.csv" > chromocoverage.txt', shell=True)
+subprocess.run('cat fastq2vcfsamples.txt | parallel -j 30 "python /mnt/storage11/sophie/gitrepos/mosquito_pipeline/chromo_coverage.py --sample {} --csvfile {}_chromocov.filtered.csv" > chromocoverage.txt', shell=True)
 
 # Single line outside Python
 # cat fastq2vcfsamples.txt | parallel -j 30 "python chromo_coverage.py --sample {} --csvfile {}_chromocov.filtered.csv" > chromocoveragelog.txt
